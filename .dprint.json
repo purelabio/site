@@ -1,0 +1,38 @@
+/*
+Usage:
+
+    dprint fmt scripts/some-file.mjs
+
+Config for https://github.com/mitranim/sublime-fmt
+
+    {
+      "selector": "source.js, source.jsx",
+      "cmd": ["dprint", "fmt", "--stdin", "mjs"],
+      "merge_type": "replace",
+    },
+*/
+{
+  "$schema": "https://dprint.dev/schemas/v0.json",
+  "incremental": true,
+  "typescript": {
+    "indentWidth": 2,
+    "semiColons": "asi",
+    "quoteStyle": "preferSingle",
+    "useBraces": "whenNotSingleLine",
+    "singleBodyPosition": "sameLine",
+    "bracePosition": "sameLine",
+    "preferSingleLine": true,
+    "importDeclaration.spaceSurroundingNamedImports": false,
+    "exportDeclaration.spaceSurroundingNamedExports": false,
+    "arrowFunction.useParentheses": "preferNone",
+    "spaceSurroundingProperties": false,
+    "nextControlFlowPosition": "nextLine",
+    "parentheses.preferSingleLine": false,
+  },
+  "includes": ["**/*.{mjs,json}"],
+  "excludes": ["**/node_modules", "package*.json"],
+  "plugins": [
+    "https://plugins.dprint.dev/typescript-0.49.0.wasm",
+    "https://plugins.dprint.dev/json-0.12.1.wasm",
+  ],
+}

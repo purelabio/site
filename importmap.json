@@ -1,0 +1,10 @@
+{
+  "imports": {
+    "path": "https://deno.land/std@0.100.0/path/mod.ts",
+    "prax": "https://cdn.jsdelivr.net/npm/prax@0.7.8/str.mjs",
+    "fpx": "https://cdn.jsdelivr.net/npm/fpx@0.11.0/fpx.mjs",
+    "imperouter": "https://cdn.jsdelivr.net/npm/imperouter@0.8.3/imperouter.mjs",
+    "afr": "https://deno.land/x/afr@0.5.1/afr.ts",
+    "espo": "https://cdn.jsdelivr.net/npm/espo@0.7.3/espo.mjs"
+  }
+}

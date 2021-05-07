@@ -1,0 +1,499 @@
+@use 'sass:color';
+@use 'style-base/reset';
+@use 'style-base/sb';
+
+@include sb.all;
+
+/* Vars */
+
+// Note: CSS variables can't be used for media queries or transformed by
+// SASS color functions.
+$breakpoint-xs: 320px;
+$breakpoint-sm: 600px;
+$breakpoint-md: 896px;
+$breakpoint-lg: 1024px;
+$light-color-prim: hsl(217, 71%, 53%);
+
+%theme-light {
+  // Fixed colors.
+  --c-gray-bg-far:    hsl(0, 0%, 46%);
+  --c-gray-bg-near:   hsl(0, 0%, 95%);
+  --c-gray-fg-far:    hsl(0, 0%, 70%);
+  --c-gray-fg-near:   hsl(0, 0%, 40%);
+  --c-red:            hsl(3,   100%, 60%);
+  --c-blue:           hsl(207, 100%, 42%);
+  --c-code-bg:        hsl(60, 33%, 97%);
+  --c-hr:             var(--c-gray-bg-near);
+  --c-prim:           #{$light-color-prim};
+
+  // Fixed default colors.
+  --c-def-bg:         white;
+  --c-def-fg:         black;
+  --c-def-act-bg:     var(--c-def-bg);
+  --c-def-act-fg:     #{$light-color-prim};
+  --c-def-act-hov-bg: var(--c-def-act-bg);
+  --c-def-act-hov-fg: #{lighten($light-color-prim, 10%)};
+
+  // Fixed inverted colors.
+  --c-inv-bg:         var(--c-prim);
+  --c-inv-fg:         var(--c-def-bg);
+  --c-inv-act-bg:     var(--c-inv-bg);
+  --c-inv-act-fg:     var(--c-def-bg);
+  --c-inv-act-hov-bg: #{lighten($light-color-prim, 10%)};
+  --c-inv-act-hov-fg: #{lighten($light-color-prim, 30%)};
+
+  // Variable colors. May be changed by "theme" classes.
+  --c-bg:             var(--c-def-bg);
+  --c-fg:             var(--c-def-fg);
+  --c-act-bg:         var(--c-def-act-bg);
+  --c-act-fg:         var(--c-def-act-fg);
+  --c-act-hov-bg:     var(--c-def-act-hov-bg);
+  --c-act-hov-fg:     var(--c-def-act-hov-fg);
+}
+
+%vars-misc {
+  --wid-outer-max:      #{$breakpoint-lg};
+  --wid-inner-max:      #{$breakpoint-md};
+  --wid-lim:            80vw;
+
+  --font-size-h1:       1.6rem;
+  --font-size-h2:       1.4rem;
+  --font-size-h3:       1.2rem;
+  --font-size-small:    0.8rem;
+  --font-size-normal:   1rem;
+  --font-size-large:    1.4rem;
+  --font-size-huge:     2rem;
+  --font-size-giant:    4rem;
+  --font-size-titan:    6rem;
+  --font-size-monster:  8rem;
+
+  --border-radius:      4px;
+  --thick-border-width: 2px;
+  // --img-box-size:       10em;
+  // --img-box-size-small: 6em;
+  --wid-narrow:         24rem;
+
+  // https://en.wikipedia.org/wiki/Golden_ratio
+  --phi: 1.6180339887498948;
+}
+
+// Source: https://brandcolors.net.
+// Might be outdated.
+%vars-brand-colors {
+  --c-skype:    #00aff0;
+  --c-github:   #4183c4;
+  --c-youtube:  #ff0000;
+  --c-twitter:  #55acee;
+  --c-linkedin: #0976b4;
+  --c-facebook: #3b5998;
+  --c-feedly:   #2bb24c;
+  --c-discord:  #7289da;
+  --c-rss:      #f26522;
+}
+
+/* Global */
+
+:root {
+  /* Typography */
+
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Segoe UI', Verdana, sans-serif;
+  @extend .wei-normal;
+
+  /* Misc */
+
+  @extend %vars-misc, %vars-brand-colors, %theme-light, .bg, .fg;
+  scroll-behavior: smooth;
+}
+
+body {
+  @extend .flex, .col, .mar-cen;
+  min-height: 100vh;
+  overflow-x: auto;
+  overflow-y: scroll;
+}
+
+code, key, pre {@extend .code;}
+
+/* Themes */
+
+.bg {background-color: var(--c-bg);}
+.fg {color: var(--c-fg);}
+
+.bg-prim {background-color: var(--c-prim);}
+.fg-prim {color: var(--c-prim);}
+
+.bg-act {background-color: var(--c-act-fg);}
+.fg-act {color: var(--c-act-fg);}
+
+.bg-act-hov {background-color: var(--c-act-hov-fg);}
+.fg-act-hov {color: var(--c-act-hov-fg);}
+
+.bg-code {background-color: var(--c-code-bg);}
+
+// .bg-def       {background-color: var(--c-def-bg);}
+// .bg-inv       {background-color: var(--c-fg);}
+// .bg-gray-far  {background-color: var(--c-gray-bg-far);}
+// .bg-gray-near {background-color: var(--c-gray-bg-near);}
+
+// .busy-bg-gray-near:hover {background-color: var(--c-gray-bg-near);}
+
+// .fg-def       {color: var(--c-def-fg);}
+// .fg-inv       {color: var(--c-bg);}
+// .fg-gray-far  {color: var(--c-gray-fg-far);}
+// .fg-gray-near {color: var(--c-gray-fg-near);}
+// .fg-blue      {color: var(--c-blue);}
+// .fg-red       {color: var(--c-red);}
+
+// .fill-fg           {fill: var(--c-fg);}
+// .fill-gray-fg-near {fill: var(--c-gray-fg-near);}
+// .stroke-fg {stroke: var(--c-fg);}
+
+// .fg-facebook {color: var(--c-facebook);}
+// .fg-github   {color: var(--c-github);}
+// .fg-linkedin {color: var(--c-linkedin);}
+// .fg-skype    {color: var(--c-skype);}
+// .fg-twitter  {color: var(--c-twitter);}
+// .fg-feedly   {color: var(--c-feedly);}
+// .fg-rss      {color: var(--c-rss);}
+// .fg-feedly   {color: var(--c-feedly);}
+// .fg-youtube  {color: var(--c-youtube);}
+
+// .fill-facebook {fill: var(--c-facebook);}
+// .fill-github   {fill: var(--c-github);}
+// .fill-linkedin {fill: var(--c-linkedin);}
+// .fill-skype    {fill: var(--c-skype);}
+// .fill-twitter  {fill: var(--c-twitter);}
+// .fill-feedly   {fill: var(--c-feedly);}
+// .fill-rss      {fill: var(--c-rss);}
+// .fill-feedly   {fill: var(--c-feedly);}
+// .fill-youtube  {fill: var(--c-youtube);}
+// .fill-discord  {fill: var(--c-discord);}
+
+.theme-def {
+  @extend .bg, .fg;
+  --c-bg:             var(--c-def-bg);
+  --c-fg:             var(--c-def-fg);
+  --c-act-bg:         var(--c-def-act-bg);
+  --c-act-fg:         var(--c-def-act-fg);
+  --c-act-hov-bg:     var(--c-def-act-hov-bg);
+  --c-act-hov-fg:     var(--c-def-act-hov-fg);
+}
+
+// TODO: also invert selection color.
+.theme-inv {
+  @extend .bg, .fg;
+  --c-bg:             var(--c-inv-bg);
+  --c-fg:             var(--c-inv-fg);
+  --c-act-bg:         var(--c-inv-act-bg);
+  --c-act-fg:         var(--c-inv-act-fg);
+  --c-act-hov-bg:     var(--c-inv-act-hov-bg);
+  --c-act-hov-fg:     var(--c-inv-act-hov-fg);
+  & & {@extend .theme-def;}
+}
+
+.hr {
+  color: var(--c-hr);
+  &::before {border-top-style: solid;}
+}
+
+// .c-act {
+//   @extend .bg-act, .fg-act;
+//   @include hov {@extend .bg-act-hov, .fg-act-hov;}
+// }
+
+/* Typography */
+
+// Overrides.
+.wei-normal {@extend .wei-lighter;}
+.wei-bold   {@extend .wei-semi;}
+
+.size-small   {font-size: var(--font-size-small);}
+.size-normal  {font-size: var(--font-size-normal);}
+.size-large   {font-size: var(--font-size-large);}
+.size-huge    {font-size: var(--font-size-huge);}
+.size-giant   {font-size: var(--font-size-giant);}
+.size-titan   {font-size: var(--font-size-titan);}
+.size-monster {font-size: var(--font-size-monster);}
+
+.font-mono {font-family: SF Mono, Menlo, Monaco, DejaVu Sans Mono, Consolas, monospace;}
+
+/* Layout */
+
+@mixin min-sm {@media (min-width: $breakpoint-sm) {@content;}}
+@mixin max-sm {@media (max-width: $breakpoint-sm) {@content;}}
+@mixin min-md {@media (min-width: $breakpoint-md) {@content;}}
+@mixin max-md {@media (max-width: $breakpoint-md) {@content;}}
+@mixin min-lg {@media (min-width: $breakpoint-lg) {@content;}}
+@mixin max-lg {@media (max-width: $breakpoint-lg) {@content;}}
+
+.page-wid-outer {
+  width: 100%;
+  max-width: var(--wid-outer-max);
+}
+
+.page-wid-inner {
+  width: 100%;
+  max-width: calc(min(var(--wid-lim), var(--wid-inner-max)));
+}
+
+.wid-narrow {max-width: var(--wid-narrow);}
+
+.page-outer {@extend .mar-cen, .page-wid-outer;}
+.page-inner {@extend .mar-cen, .page-wid-inner;}
+
+@mixin page-pad($pad) {
+  @include sb.mar-cen;
+  @include sb.pad-hor($pad);
+}
+
+@function page-pad-outer() {
+  @return calc(
+    (100vw - min(var(--wid-lim), var(--wid-outer-max))) / 2
+  );
+}
+
+@function page-pad-outer-1() {
+  @return calc(
+    (100vw - min(var(--wid-lim), var(--wid-outer-max))) / 2
+  );
+}
+
+@function page-pad-outer-minus-1-em() {
+  @return calc(
+    (100vw - min(var(--wid-lim), var(--wid-outer-max)) - 1em) / 2
+  );
+}
+
+@function page-pad-inner() {
+  @return calc(
+    (100vw - min(var(--wid-lim), var(--wid-inner-max))) / 2
+  );
+}
+
+.page-pad-outer {
+  @include page-pad(page-pad-outer());
+}
+
+.page-pad-outer-1 {
+  @include page-pad(page-pad-outer-1());
+}
+
+.page-pad-inner {
+  @include page-pad(page-pad-inner());
+}
+
+.gold-rat-lg {width: calc(100%/var(--phi));}
+
+.gold-rat-sm {width: calc(100%/var(--phi)/var(--phi));}
+
+.gold-rat-lg-sm {
+  > :first-child {@extend .gold-rat-lg;}
+  > :last-child {@extend .gold-rat-sm;}
+}
+
+.gold-rat-sm-lg {
+  > :first-child {@extend .gold-rat-sm;}
+  > :last-child {@extend .gold-rat-lg;}
+}
+
+/* Misc */
+
+@mixin hov {&:not([disabled]) {&:hover, &:focus {@content;}}}
+@mixin act {&:active, &[aria-current] {@content;}}
+
+// TODO move to SB.
+// Probably rename to avoid conflict with CSS grid "self" properties.
+.self-sta {@include sb.ali-self-sta;}
+.self-cen {@include sb.ali-self-cen;}
+.self-end {@include sb.ali-self-end;}
+.self-str {@include sb.ali-self-str;}
+
+.pad-top-6 {padding-top: 6rem;}
+.pad-top-8 {padding-top: 8rem;}
+.mar-top-aut {margin-top: auto;}
+
+[disabled] {@extend .cur-not;}
+
+.navbar {
+  @extend .sticky, .wid-100p, .page-pad-outer-1, .flex, .row-bet-cen, .pad-ver-2;
+  // @extend .wid-100p, .page-pad-outer-1, .flex, .row-bet-cen, .pad-ver-2;
+
+  // Required for `.--stuck` detection, see `navbar.html`.
+  top: -1px;
+  left: 0;
+  right: 0;
+
+  // Prevents accidentally rendering below elements in their own stacking
+  // context. The gotcha is not limited to `relative` or `z-index`. For
+  // example, image filters put images in their own stacking context, which
+  // could overlap our fixed navbar.
+  z-index: 1;
+
+  @extend .theme-def;
+  &.--stuck {@extend .theme-inv;}
+}
+
+.pad-broad {@extend .pad-hor-1, .pad-ver-0x5;}
+
+.under {
+  text-decoration: underline;
+  text-decoration: underline var(--thick-border-width);
+  text-underline-offset: 0.5ex;
+}
+
+.decolink[href] {
+  @include hov {@extend .under, .fg-act-hov;}
+  @include act {@extend .under, .fg-act;}
+}
+
+.navlink {@extend .decolink, .flex, .row-cen-cen, .pad-broad;}
+
+.navlink-btn {
+  @extend .flex, .row-cen-cen, .pad-broad, .fg-act, .theme-inv, .round;
+  @include hov {@extend .fg-act-hov;}
+}
+
+.footer {@extend .mar-top-aut;}
+.footer-track {@extend .page-inner, .flex, .row;}
+.footer-cell {@extend .flex-1, .flex-noshrink, .pad-1;}
+
+.svg-icon {
+  @extend .flex-noshrink;
+  width: 1em;
+  height: 1em;
+}
+
+.skip-to-content {
+  @extend .theme-inv, .fix-tl;
+
+  // This visually hides the element while allowing it to receive focus.
+  // `display: none` or `visibility: hidden` would have prevented focus.
+  padding: 0;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  overflow: hidden;
+
+  &:focus {
+    @extend .pad-1;
+    width: initial;
+    height: initial;
+    opacity: initial;
+    overflow: initial;
+  }
+}
+
+.round {border-radius: var(--border-radius);}
+.code {@extend .bg-code, .font-mono;}
+.bord-top {border-top: 1px solid var(--c-gray-fg-far);}
+.bord {border: 1px solid var(--c-gray-fg-far);}
+
+.brand-logo-link {
+  @extend .fg-act, .trans-upper, .wei-bold, .size-huge;
+  @include hov {@extend .fg-act-hov;}
+  letter-spacing: 0.1em;
+}
+
+.jumbo-title {
+  @extend .wei-bold;
+  color: var(--c-gray-bg-near);
+  font-size: var(--font-size-titan);
+
+  // Magic number, TODO avoid.
+  line-height: 2ex;
+
+  @include page-pad(page-pad-outer-1());
+
+  @include min-lg {
+    @include page-pad(page-pad-outer-minus-1-em());
+    font-size: var(--font-size-monster);
+  }
+}
+
+.jumbo-sub {
+  @extend .page-pad-outer-1, .size-huge, .wei-normal;
+
+  // No `@extend` to avoid property reordering.
+  *            + & {margin-top: 1rem;}
+  .jumbo-title + & {margin-top: -3ex;}
+}
+
+.jumbo-desc {
+  @extend .page-pad-outer-1;
+  * + & {@extend .mar-top-1;}
+}
+
+.showcase {@extend .flex, .row, .gap-hor-2, .gold-rat-sm-lg;}
+
+.showcase-info {
+  @extend .flex, .col, .gap-ver-1, .self-str;
+  h2 {@extend .size-huge;}
+}
+
+.showcase-img {
+  @extend .self-sta;
+  img {@extend .img-std, .self-str;}
+}
+
+.img-std {@extend .img-con, .round;}
+
+.grid-logos {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
+
+  > * {
+    @extend .flex, .col-cen-cen, .pad-2;
+    box-shadow: 0 0 0 1px var(--c-gray-bg-near);
+  }
+}
+
+.btn {@extend .pad-broad, .round;}
+.abs-b {@extend .abs; bottom: 0; left: 0; right: 0;}
+.abs-tl {@extend .abs; top: 0; left: 0;}
+.fix-tl {@extend .fix; top: 0; left: 0;}
+.strut {@extend .flex-1;}
+
+.aspect-ratio {@extend .grid-overlap;}
+
+// Allows all children to occupy the same slot. Useful for arcane tricks.
+.grid-overlap {
+  display: grid;
+  > * {grid-area: 1/1;}
+}
+
+// Mirrors `.bg-con`. TODO move to SB.
+.img-con {
+  object-position: center;
+  object-fit: contain;
+}
+
+// Mirrors `.bg-cov`. TODO move to SB.
+.img-con {
+  object-position: center;
+  object-fit: cover;
+}
+
+.expand {@extend .wid-100p, .hei-100p;}
+
+.gap-ver-aro-1 > * {@extend .mar-ver-1;}
+
+.gap-ver-2-to-4 {
+  @include sb.gap-ver(2rem);
+  @include min-sm {@include sb.gap-ver(4rem);}
+}
+
+.grayscale {filter: grayscale(100%);}
+
+.grid-2-to-4 {
+  display: grid;
+
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+
+  @include min-sm {
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 2rem;
+  }
+}
+
+.list-inside {list-style-position: inside;}
