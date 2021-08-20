@@ -85,15 +85,24 @@ function Footer(page, site, {class: cls, ...props} = {}) {
   )
 }
 
+/*
+Disabled for now. Known issues:
+
+  * Doesn't interact well with sticky header.
+  * Not properly tested with assistive tech.
+  * Index page has main ID in the wrong place.
+*/
 function SkipToContent() {
-  return e.a(
-    {
-      href: c.MAIN_ID,
-      class: `skip-to-content`,
-      onclick: `event.preventDefault(); if (document.getElementById('main')) {document.getElementById('main').scrollIntoView()}`,
-    },
-    `Skip to content`,
-  )
+  return undefined
+
+  // return e.a(
+  //   {
+  //     href: c.MAIN_ID,
+  //     class: `skip-to-content`,
+  //     onclick: `event.preventDefault(); if (document.getElementById('main')) {document.getElementById('main').scrollIntoView()}`,
+  //   },
+  //   `Skip to content`,
+  // )
 }
 
 export function Main(...children) {
@@ -113,7 +122,7 @@ export function Jumbo({theme, title, sub, desc}) {
   return (
     e.div({class: theme},
       title && e.h1({class: `jumbo-title`}, title),
-      sub && e.p({class: x.cls(`jumbo-sub`)}, sub),
+      sub && e.p({class: `jumbo-sub`}, sub),
       desc && e.p({class: `jumbo-desc`}, desc),
     )
   )

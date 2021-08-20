@@ -14,7 +14,7 @@ export class Site {
     this.main = [
       new PageWhat(),
       new PageWho(),
-      new PageContact(),
+      // new PageContact(),
     ]
 
     this.misc = [
@@ -175,8 +175,7 @@ function MainBanner() {
     ),
     sm.Img({
       src: u.imgPath(`Group 11 Copy.svg`),
-      class: `rel`,
-      style: {bottom: '-2rem'},
+      style: {marginBottom: '-2rem'},
     }),
   )
 }
@@ -332,7 +331,6 @@ class PageWhat extends Page {
   get link() {return `/what`}
   get title() {return `What we've done`}
 
-  // Placeholder.
   res(site) {
     return u.resHtml(sm.Html(
       {page: this, site},

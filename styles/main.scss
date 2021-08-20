@@ -13,16 +13,18 @@ $breakpoint-sm: 600px;
 $breakpoint-md: 896px;
 $breakpoint-lg: 1024px;
 $light-color-prim: hsl(217, 71%, 53%);
+$z-nav: 1;
+$z-skip: $z-nav + 1;
 
 %theme-light {
   // Fixed colors.
-  --c-gray-bg-far:    hsl(0, 0%, 46%);
-  --c-gray-bg-near:   hsl(0, 0%, 95%);
-  --c-gray-fg-far:    hsl(0, 0%, 70%);
-  --c-gray-fg-near:   hsl(0, 0%, 40%);
+  --c-gray-bg-far:    hsl(0,   0%,   46%);
+  --c-gray-bg-near:   hsl(0,   0%,   95%);
+  --c-gray-fg-far:    hsl(0,   0%,   70%);
+  --c-gray-fg-near:   hsl(0,   0%,   40%);
   --c-red:            hsl(3,   100%, 60%);
   --c-blue:           hsl(207, 100%, 42%);
-  --c-code-bg:        hsl(60, 33%, 97%);
+  --c-code-bg:        hsl(60,  33%,  97%);
   --c-hr:             var(--c-gray-bg-near);
   --c-prim:           #{$light-color-prim};
 
@@ -327,7 +329,7 @@ code, key, pre {@extend .code;}
   // context. The gotcha is not limited to `relative` or `z-index`. For
   // example, image filters put images in their own stacking context, which
   // could overlap our fixed navbar.
-  z-index: 1;
+  z-index: $z-nav;
 
   @extend .theme-def;
   &.--stuck {@extend .theme-inv;}
@@ -337,11 +339,11 @@ code, key, pre {@extend .code;}
 
 .under {
   text-decoration: underline;
-  text-decoration: underline var(--thick-border-width);
+  text-decoration-thickness: var(--thick-border-width);
   text-underline-offset: 0.5ex;
 }
 
-.decolink[href] {
+.decolink:any-link {
   @include hov {@extend .under, .fg-act-hov;}
   @include act {@extend .under, .fg-act;}
 }
@@ -353,9 +355,9 @@ code, key, pre {@extend .code;}
   @include hov {@extend .fg-act-hov;}
 }
 
-.footer {@extend .mar-top-aut;}
+.footer       {@extend .mar-top-aut;}
 .footer-track {@extend .page-inner, .flex, .row;}
-.footer-cell {@extend .flex-1, .flex-noshrink, .pad-1;}
+.footer-cell  {@extend .flex-1, .flex-noshrink, .pad-1;}
 
 .svg-icon {
   @extend .flex-noshrink;
@@ -364,7 +366,7 @@ code, key, pre {@extend .code;}
 }
 
 .skip-to-content {
-  @extend .theme-inv, .fix-tl;
+  @extend .theme-def, .fix-tl;
 
   // This visually hides the element while allowing it to receive focus.
   // `display: none` or `visibility: hidden` would have prevented focus.
@@ -380,6 +382,7 @@ code, key, pre {@extend .code;}
     height: initial;
     opacity: initial;
     overflow: initial;
+    z-index: $z-skip;
   }
 }
 
@@ -447,11 +450,11 @@ code, key, pre {@extend .code;}
   }
 }
 
-.btn {@extend .pad-broad, .round;}
-.abs-b {@extend .abs; bottom: 0; left: 0; right: 0;}
+.btn    {@extend .pad-broad, .round;}
+.abs-b  {@extend .abs; bottom: 0; left: 0; right: 0;}
 .abs-tl {@extend .abs; top: 0; left: 0;}
 .fix-tl {@extend .fix; top: 0; left: 0;}
-.strut {@extend .flex-1;}
+.strut  {@extend .flex-1;}
 
 .aspect-ratio {@extend .grid-overlap;}
 
