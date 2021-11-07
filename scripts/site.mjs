@@ -221,7 +221,7 @@ const MUGS = [
   {name: `Yury Egorenkov`, title: `Chief Executive Officer`,  img: u.imgPath(`ye.jpg`)},
   {name: `Nelo Mitranim`,  title: `Chief Technology Officer`, img: u.imgPath(`nm.jpg`)},
   {name: `Anton Minkov`,   title: `Chief Creative Officer`,   img: u.imgPath(`am.jpg`)},
-  {name: `Mike Frolov`,    title: `Team Lead`,                img: u.imgPath(`mf.jpg`)},
+  // {name: `Mike Frolov`,    title: `Team Lead Mobile`,                img: u.imgPath(`mf.jpg`)},
 ]
 
 function Mugs() {
