@@ -1,67 +1,47 @@
-import * as a from 'afr'
-import * as r from 'imperouter'
+import * as a from '@mitranim/js/all.mjs'
+import * as hd from '@mitranim/js/http_deno.mjs'
+import * as ld from '@mitranim/js/live_deno.mjs'
 import * as c from './conf.mjs'
 import * as s from './site.mjs'
-import * as u from './util.mjs'
+import * as cl from './cmd_live.mjs'
 
-const dirs = [
-  a.dir(c.TARGET),
-  a.dir(c.STATIC),
-  a.dir(`.`,      /^(?:images)[/]/),
-  a.dir(`images`, /^(?:images)[/]/),
-]
+export const dirs = ld.LiveDirs.of(
+  hd.dirRel(c.TARGET),
+  hd.dirRel(c.STATIC),
+  hd.dirRel(`.`, /^(?:images)[/]/),
+  hd.dirRel(`images`),
+  a.vac(!c.PROD) && hd.dirAbs(),
+)
 
-const site = new s.Site()
-const lis = Deno.listen(c.SRV_OPTS)
-console.log(`[srv] listening on http://${c.SRV_OPTS.hostname || 'localhost'}:${c.SRV_OPTS.port}`)
+const site = s.Site.main
 
-watch()
+const srv = new class Srv extends hd.Srv {
+  async res(req) {
+    const rou = new a.ReqRou(req)
 
-// TODO: convert to top-level await once Eslint is updated to 8.0+
-export default serve()
-
-async function watch() {
-  a.maybeSend(a.change, c.AFR_OPTS)
-  for await (const msg of a.watch('.', dirs, {recursive: true})) {
-    a.maybeSend(msg, c.AFR_OPTS)
+    return live(await (
+      (await dirs.resolveSiteFile(rou.url))?.res() ||
+      site.pageByPath(rou.url.pathname)?.res() ||
+      site.notFound.res(rou)
+    ))
   }
+
+  errRes(err) {return live(new s.PageErr(site, err).res())}
+}()
+
+async function main() {
+  liveReload()
+  await srv.listen({port: c.SRV_PORT, hostname: `localhost`})
 }
 
-async function serve() {
-  for await (const conn of lis) serveHttp(conn).catch(a.logErr)
+/*
+Tells each connected "live client" to reload the page.
+Requires `make live`, which is invoked by default by `make`.
+*/
+function liveReload() {
+  fetch(cl.LIVE_SEND, {method: `post`, body: `{"type":"change"}`}).catch(a.nop)
 }
 
-async function serveHttp(conn) {
-  for await (const event of Deno.serveHttp(conn)) respond(event).catch(a.logErr)
-}
+function live(res) {return ld.withLiveClient(cl.LIVE_CLIENT, res)}
 
-async function respond(event) {
-  await event.respondWith(u.resUncache(await response(event.request)))
-}
-
-async function response(req) {
-  try {
-    return (
-      (await a.resFile(req, dirs)) ||
-      r.any(req, /[.]\w+$/, r.notFound) ||
-      (await r.get(req, /(?:)/, resPage)) ||
-      r.notFound(req)
-    )
-  }
-  catch (err) {
-    console.error(`[srv] unexpected error while serving ${req.url}:`, err)
-    return u.resErr(err)
-  }
-}
-
-async function resPage(req) {
-  try {
-    const {pathname} = new URL(req.url)
-    const page = site.pageByLink(pathname) || new s.Page404({})
-    return await page.res(site).native()
-  }
-  catch (err) {
-    console.error(`[srv] unexpected error while serving ${req.url}:`, err)
-    return new s.PageErr({err}).res(site).native()
-  }
-}
+if (import.meta.main) await main()

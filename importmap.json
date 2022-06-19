@@ -1,10 +1,34 @@
 {
   "imports": {
-    "path": "https://deno.land/std@0.100.0/path/mod.ts",
-    "prax": "https://cdn.jsdelivr.net/npm/prax@0.7.8/str.mjs",
-    "fpx": "https://cdn.jsdelivr.net/npm/fpx@0.11.0/fpx.mjs",
-    "imperouter": "https://cdn.jsdelivr.net/npm/imperouter@0.8.3/imperouter.mjs",
-    "afr": "https://deno.land/x/afr@0.5.1/afr.ts",
-    "espo": "https://cdn.jsdelivr.net/npm/espo@0.7.3/espo.mjs"
+    "@mitranim/js": "https://cdn.jsdelivr.net/npm/@mitranim/js@0.1.32",
+    "@mitranim/js/all.mjs": "https://cdn.jsdelivr.net/npm/@mitranim/js@0.1.32/all.mjs",
+    "@mitranim/js/cli.mjs": "https://cdn.jsdelivr.net/npm/@mitranim/js@0.1.32/cli.mjs",
+    "@mitranim/js/coll.mjs": "https://cdn.jsdelivr.net/npm/@mitranim/js@0.1.32/coll.mjs",
+    "@mitranim/js/dom.mjs": "https://cdn.jsdelivr.net/npm/@mitranim/js@0.1.32/dom.mjs",
+    "@mitranim/js/dom_glob_native.mjs": "https://cdn.jsdelivr.net/npm/@mitranim/js@0.1.32/dom_glob_native.mjs",
+    "@mitranim/js/dom_glob_shim.mjs": "https://cdn.jsdelivr.net/npm/@mitranim/js@0.1.32/dom_glob_shim.mjs",
+    "@mitranim/js/dom_reg.mjs": "https://cdn.jsdelivr.net/npm/@mitranim/js@0.1.32/dom_reg.mjs",
+    "@mitranim/js/dom_shim.mjs": "https://cdn.jsdelivr.net/npm/@mitranim/js@0.1.32/dom_shim.mjs",
+    "@mitranim/js/http.mjs": "https://cdn.jsdelivr.net/npm/@mitranim/js@0.1.32/http.mjs",
+    "@mitranim/js/http_deno.mjs": "https://cdn.jsdelivr.net/npm/@mitranim/js@0.1.32/http_deno.mjs",
+    "@mitranim/js/http_srv.mjs": "https://cdn.jsdelivr.net/npm/@mitranim/js@0.1.32/http_srv.mjs",
+    "@mitranim/js/io_deno.mjs": "https://cdn.jsdelivr.net/npm/@mitranim/js@0.1.32/io_deno.mjs",
+    "@mitranim/js/iter.mjs": "https://cdn.jsdelivr.net/npm/@mitranim/js@0.1.32/iter.mjs",
+    "@mitranim/js/lang.mjs": "https://cdn.jsdelivr.net/npm/@mitranim/js@0.1.32/lang.mjs",
+    "@mitranim/js/live_client.mjs": "https://cdn.jsdelivr.net/npm/@mitranim/js@0.1.32/live_client.mjs",
+    "@mitranim/js/live_deno.mjs": "https://cdn.jsdelivr.net/npm/@mitranim/js@0.1.32/live_deno.mjs",
+    "@mitranim/js/obj.mjs": "https://cdn.jsdelivr.net/npm/@mitranim/js@0.1.32/obj.mjs",
+    "@mitranim/js/obs.mjs": "https://cdn.jsdelivr.net/npm/@mitranim/js@0.1.32/obs.mjs",
+    "@mitranim/js/obs_dom.mjs": "https://cdn.jsdelivr.net/npm/@mitranim/js@0.1.32/obs_dom.mjs",
+    "@mitranim/js/path.mjs": "https://cdn.jsdelivr.net/npm/@mitranim/js@0.1.32/path.mjs",
+    "@mitranim/js/prax.mjs": "https://cdn.jsdelivr.net/npm/@mitranim/js@0.1.32/prax.mjs",
+    "@mitranim/js/sched.mjs": "https://cdn.jsdelivr.net/npm/@mitranim/js@0.1.32/sched.mjs",
+    "@mitranim/js/str.mjs": "https://cdn.jsdelivr.net/npm/@mitranim/js@0.1.32/str.mjs",
+    "@mitranim/js/test.mjs": "https://cdn.jsdelivr.net/npm/@mitranim/js@0.1.32/test.mjs",
+    "@mitranim/js/time.mjs": "https://cdn.jsdelivr.net/npm/@mitranim/js@0.1.32/time.mjs",
+    "@mitranim/js/url.mjs": "https://cdn.jsdelivr.net/npm/@mitranim/js@0.1.32/url.mjs",
+    "marked": "https://cdn.jsdelivr.net/npm/marked@4.0.14/src/marked.js",
+
+    "@mitranim/js/dom_glob": "https://cdn.jsdelivr.net/npm/@mitranim/js@0.1.32/dom_glob_shim.mjs"
   }
 }

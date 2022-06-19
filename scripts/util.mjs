@@ -1,44 +1,50 @@
-import * as f from 'fpx'
-import * as x from 'prax'
-import * as es from 'espo'
-import * as e from './elem.mjs'
+import * as a from '@mitranim/js/all.mjs'
+import * as p from '@mitranim/js/prax.mjs'
+import * as dr from '@mitranim/js/dom_reg.mjs'
+import * as ds from '@mitranim/js/dom_shim.mjs'
+import * as dg from '@mitranim/js/dom_glob'
 
-export class Res extends Response {
-  constructor(body, init) {
-    super(undefined, init)
-    es.pubs(this, {body})
+dr.Reg.main.setDefiner(dg.customElements)
+
+export const ren = new p.Ren(dg.document).patchProto(dg.glob.Element)
+export const E = ren.E
+export const S = ren.S
+
+/*
+Short for "attributes". Provides shortcuts for element props/attributes.
+See examples in `site.mjs`.
+*/
+export const A = class PropBui extends p.PropBui {
+  bgImg(val) {
+    val = a.renderLax(val)
+    if (val) return this.style({backgroundImage: `url(${val})`})
+    return this
   }
 
-  native() {return new Response(this.body, this)}
+  href(val) {
+    const self = super.href(val)
+    if (/^\w+:/.test(a.laxStr(self.get(`href`)))) return self.tarblan()
+    return self
+  }
 
-  get [Symbol.toStringTag]() {return this.constructor.name}
-}
+  // Must be called after `.href()`.
+  cur(page) {return this.current(a.isSubpath(this.get(`href`), page.urlPath()))}
 
-export function resHtml(body, init) {
-  const res = new Res(body, init)
-  res.headers.set('content-type', 'text/html')
-  return res
-}
+  current(ok) {return ok ? this.set(`aria-current`, `page`) : this}
+}.main
 
-export function resErr(err) {
-  return new Response(err?.stack || err?.message || `unknown error`, {status: 500})
-}
-
-export function resUncache(res) {
-  res.headers.set(`cache-control`, `no-store, max-age=0`)
-  return res
-}
+export function MixElem(cls) {return p.MixChild(a.MixNode(cls))}
 
 // TODO generalize in makefile.
 export function timing(msg, fun, ...args) {
-  f.req(msg, f.isStr)
-  f.req(fun, f.isFun)
+  a.reqStr(msg)
+  a.reqFun(fun)
 
   console.log(`[${msg}] starting`)
   const t0 = Date.now()
+
   try {
-    // eslint-disable-next-line no-invalid-this
-    return fun.apply(this, args)
+    return fun(...args)
   }
   finally {
     const t1 = Date.now()
@@ -47,40 +53,7 @@ export function timing(msg, fun, ...args) {
 }
 
 export function funTiming(fun, ...args) {
-  return timing(f.show(fun), fun, ...args)
-}
-
-export function link(href, page) {
-  href = f.vac(href)
-  return {href, ...cur(href, page), ...blan(href)}
-}
-
-const ariaCurrentPage = Object.freeze({ariaCurrent: `page`})
-
-export function cur(link, page) {
-  return f.vac(isCur(link, page)) && ariaCurrentPage
-}
-
-// Semi-placeholder. Inefficient but not our bottleneck.
-function isCur(link, page) {
-  const one = new URL(f.str(link),       `file:`)
-  const two = new URL(f.str(page?.link), `file:`)
-
-  return (
-    one.origin   === two.origin &&
-    one.pathname === two.pathname
-  )
-}
-
-export function strMarker(val) {return val ? '' : undefined}
-
-export function spaced(...nodes) {return inter(nodes, ' ')}
-
-export function inter(vals, sep) {
-  const out = []
-  for (const val of vals) out.push(val, sep)
-  out.pop()
-  return out
+  return timing(a.show(fun), fun, ...args)
 }
 
 /*
@@ -96,65 +69,26 @@ Image processing:
   * Vector: consider https://github.com/RazrFalcon/svgcleaner.
 */
 export function imgPath(path) {
-  return f.vac(path && pathJoin(`images/`, path))
+  return a.url().setPath(`/images`, path)
 }
 
-// Semi-placeholder.
-export function pathJoin(...vals) {
-  return f.fold(vals, undefined, urlAppend)?.pathname
-}
-
-export function urlAppend(base, val) {
-  if (f.isNil(val)) return base
-  f.req(val, isStringer)
-  return new URL(val, base || `file:`)
-}
-
-export function bgImg(url) {
-  url = f.str(url)
-  return f.vac(url && {backgroundImage: `url(${JSON.stringify(url)})`})
-}
-
-export const ablan = Object.freeze({
-  target: `_blank`,
-  rel: `noopener noreferrer`,
-})
-
-export function blan(href) {
-  return f.vac(/^\w+:/.test(f.str(href)) && ablan)
-}
-
-export function inlineScript(props, fun) {
-  f.req(fun, f.isFun)
-  return x.E(`script`, props, new x.Raw(`void ${fun.toString()}()`))
-}
-
-// Adapted from `prax`.` Should be moved to `fpx`, possibly with some redesign.
-export function isStringer(val) {
-  if (f.isNil(val)) return false
-  if (f.isPrim(val)) return true
-  if (f.isFun(val)) return false
-
-  const {toString} = val
-
-  return (
-    toString !== Object.prototype.toString &&
-    toString !== Array.prototype.toString
-  )
+export function inlineScript(fun) {
+  a.reqFun(fun)
+  return E.script.chi(`void ${fun.toString()}()`)
 }
 
 // Similar to HTML's treatment of text.
 export function collapse(val) {
-  return f.str(val).replace(/\s+/g, ' ').trim()
+  return a.laxStr(val).replace(/\s+/g, ` `).trim()
 }
 
 // Supports only `**` for bold and `_` for italic.`
 export function mdToHtml(val) {
-  val = f.str(val).trim()
+  val = a.trim(val)
   val = val.replaceAll(/[*][*]([^*]*)[*][*]/g, wrapBold)
   val = val.replaceAll(/_([^_]*)_/g, wrapItalic)
-  return new x.Raw(val)
+  return new p.Raw(val)
 }
 
-function wrapBold(_, val) {return e.bv(val)}
-function wrapItalic(_, val) {return e.emv(val)}
+function wrapBold(_, val) {return `<b>${ds.escapeText(val)}</b>`}
+function wrapItalic(_, val) {return `<em>${ds.escapeText(val)}</em>`}

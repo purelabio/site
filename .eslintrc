@@ -1,5 +1,5 @@
 {
-  "parserOptions": {"sourceType": "module"},
+  "parserOptions": {"ecmaVersion": "latest", "sourceType": "module"},
   "env": {
     "es2020": true,
     "browser": true,
@@ -10,16 +10,18 @@
   "rules": {
     "no-unused-vars": ["error", {"argsIgnorePattern": "^_.", "varsIgnorePattern": "^_."}],
     "no-invalid-this": ["error", {"capIsConstructor": false}],
+    "semi": ["error", "never"],
+    "consistent-return": "error",
 
     "no-restricted-globals": ["error",
       // window (browser)
       "alert", "blur", "confirm", "event", "find", "focus", "history",
-      "length", "location", "name", "navigator", "open", "parent", "print",
-      "prompt", "scroll", "self", "status", "stop", "top", "caches",
+      "length", "location", "name", "open", "parent", "print",
+      "prompt", "scroll", "self", "status", "stop", "top", "close", "caches",
       // global (node)
       "root",
       // other
-      "test", "params",
+      "test", "params", "toString",
       // These global functions are broken
       "isNaN", "isFinite",
     ],

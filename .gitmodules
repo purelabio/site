@@ -1,4 +1,4 @@
-[submodule "style-base"]
-	path = submodules/style-base
-	url = https://github.com/mitranim/style-base.git
+[submodule "mod/sb"]
+	path = mod/sb
+	url = https://github.com/mitranim/sb.git
 	shallow = true

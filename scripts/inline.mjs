@@ -13,7 +13,7 @@ export function head() {
   }
 
   class Nav extends HTMLElement {
-    connectedCallback()    {if (obs) obs.observe(this)}
+    connectedCallback() {if (obs) obs.observe(this)}
     disconnectedCallback() {if (obs) obs.unobserve(this)}
   }
   customElements.define(`a-nav`, Nav)

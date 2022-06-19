@@ -1,164 +1,127 @@
-import * as f from 'fpx'
-import * as x from 'prax'
-import {E} from 'prax'
-import * as a from 'afr'
+import * as a from '@mitranim/js/all.mjs'
+import * as p from '@mitranim/js/prax.mjs'
 import * as c from './conf.mjs'
+import {A, E, S} from './util.mjs'
 import * as u from './util.mjs'
-import * as e from './elem.mjs'
 import * as inl from './inline.mjs'
 
-export function Html({page, site, theme}, ...children) {
-  return x.doc(
-    e.htmlv(
-      e.headv(
-        e.meta({charset:   `utf-8`}),
-        e.meta({httpEquiv: `X-UA-Compatible`, content: `IE=edge,chrome=1`}),
-        e.meta({name:      `viewport`,        content: `width=device-width, minimum-scale=1, maximum-scale=2, initial-scale=1, user-scalable=yes`}),
-        e.link({rel:       `icon`,            href:    `data:;base64,=`}),
-        e.meta({name:      `description`,     content: page.desc || `about:purelab`}),
-        e.link({rel:       `stylesheet`,      type:    `text/css`, href: `/styles/main.css`}),
-        e.meta({name:      `author`,          content: `Purelab.io`}),
-        e.titlev(page.title || `about:purelab`),
-        f.vac(!c.PROD) && e.script({type: `module`, src: a.clientPath(c.AFR_OPTS)}),
-        swScript(),
-        u.inlineScript({}, inl.head),
+export function Html(page, ...chi) {
+  return p.renderDocument(
+    E.html.chi(
+      E.head.chi(
+        E.meta.props(A.charset(`utf-8`)),
+        E.meta.props(A.httpEquiv(`X-UA-Compatible`).content(`IE=edge,chrome=1`)),
+        E.meta.props(A.name(`viewport`).content(`width=device-width, minimum-scale=1, maximum-scale=2, initial-scale=1, user-scalable=yes`)),
+        E.link.props(A.rel(`icon`).href(`data:;base64,=`)),
+        E.meta.props(A.name(`author`).content(`Purelab.io`)),
+        E.meta.props(A.name(`description`).content(page.desc || `about:purelab`)),
+        E.link.props(A.rel(`stylesheet`).type(`text/css`).href(`/styles/main.css`)),
+        E.title.chi(page.title() || `about:purelab`),
+        u.inlineScript(inl.head),
       ),
-      e.bodyv(
-        SkipToContent(),
-        Header(page, site, theme),
-        children,
-        e.div({class: `mar-top-4`}),
-        Footer(page, site),
+      E.body.chi(
+        Header(page),
+        chi,
+        E.div.props(A.cls(`mar-top-4`)),
+        Footer(page),
       ),
     )
   )
 }
 
-function swScript() {
-  const browserScriptUsesLibs = false
-  if (!browserScriptUsesLibs) return null
-
-  return e.scriptv(new x.Raw(`navigator.serviceWorker.register('/sw.mjs')`))
+function Header(page) {
+  return E[`a-nav`]
+    .props(A.role(`navigation`).cls(`navbar`).cls(page.theme()))
+    .chi(
+      LogoLink(),
+      E.span.props(A.cls(`strut`)),
+      a.map(page.site.main, sub => (
+        E.a.props(A.href(sub.urlPath()).cur(page).cls(`navlink`)).chi(sub.title())
+      )),
+      // E.a.props(A.href(`/start`).cur(page).cls(`navlink-btn`)).chi(`Start a project`),
+    )
 }
 
-function Header(page, site, theme) {
-  return E(
-    `a-nav`,
-    {id: `top`, role: `header`, class: x.cls(`navbar`, theme)},
-    LogoLink(),
-    e.span({class: `strut`}),
-    f.map(site.main, ({link, title}) => (
-      A({page, href: link, class: `navlink`}, title)
-    )),
-    A({page, href: `/start`, class: `navlink-btn`}, `Start a project`),
-  )
-}
+function Footer(page) {
+  const tel = `+0-123-456-78-90`
 
-function Footer(page, site, {class: cls, ...props} = {}) {
-  return e.footer(
-    {class: x.cls(`footer`, cls), ...props},
-    e.div({class: `footer-track`},
-      e.div({class: `footer-cell`}, LogoLink()),
-      e.div({class: `footer-cell flex col-sta-sta gap-ver-1`},
-        f.map(site.main, ({link, title}) => (
-          A({page, href: link, class: `decolink`}, title)
+  return E.footer.props(A.cls(`footer`)).chi(
+    E.div.props(A.cls(`footer-track`)).chi(
+      E.div.props(A.cls(`footer-cell`)).chi(LogoLink()),
+      E.div.props(A.cls(`footer-cell flex col-sta-sta gap-ver-1`)).chi(
+        a.map(page.site.main, sub => (
+          E.a.props(A.href(sub.urlPath()).cur(page).cls(`decolink`)).chi(sub.title())
         )),
       ),
-      e.div({class: `footer-cell flex col-sta-end gap-ver-1 text-right`},
-        A({page, href: `mailto:info@purelab.io`, class: `decolink`}, `info@purelab.io`),
-        A({page, href: `tel:+7-123-456-78-90`}, `+7-123-456-78-90`),
+      E.div.props(A.cls(`footer-cell flex col-sta-end gap-ver-1 text-right`)).chi(
+        E.a.props(A.href(`mailto:info@purelab.io`).cls(`decolink`)).chi(`info@purelab.io`),
+        E.a.props(A.href(`tel:` + tel)).chi(tel),
       ),
     ),
-    e.hr({class: `hr`}),
-    e.div({class: `footer-track`},
-      e.div({class: `footer-cell`}),
-      e.div({class: `footer-cell flex row gap-hor-1`},
-        A({page, href: ``, class: `decolink flex row-cen-cen`}, `LinkedIn`),
-        A({page, href: ``, class: `decolink flex row-cen-cen`}, `GitHub`),
-        A({page, href: ``, class: `decolink flex row-cen-cen`}, `Facebook`),
-        A({page, href: ``, class: `decolink flex row-cen-cen`}, `Instagram`)
+    E.hr.props(A.cls(`hr`)),
+    E.div.props(A.cls(`footer-track`)).chi(
+      E.div.props(A.cls(`footer-cell`)),
+      E.div.props(A.cls(`footer-cell flex row gap-hor-1`)).chi(
+        E.a.props(A.cls(`decolink flex row-cen-cen`).cur(page)).chi(`LinkedIn`),
+        E.a.props(A.cls(`decolink flex row-cen-cen`).cur(page)).chi(`GitHub`),
+        E.a.props(A.cls(`decolink flex row-cen-cen`).cur(page)).chi(`Facebook`),
+        E.a.props(A.cls(`decolink flex row-cen-cen`).cur(page)).chi(`Instagram`)
       ),
-      e.div({class: `footer-cell text-right`},
-        e.spanv(`© Purelab.io ${c.GEO}`),
+      E.div.props(A.cls(`footer-cell text-right`)).chi(
+        E.span.chi(`© Purelab.io `, c.GEO),
       ),
     ),
   )
 }
 
-/*
-Disabled for now. Known issues:
-
-  * Doesn't interact well with sticky header.
-  * Not properly tested with assistive tech.
-  * Index page has main ID in the wrong place.
-*/
-function SkipToContent() {
-  return undefined
-
-  // return e.a(
-  //   {
-  //     href: c.MAIN_ID,
-  //     class: `skip-to-content`,
-  //     onclick: `event.preventDefault(); if (document.getElementById('main')) {document.getElementById('main').scrollIntoView()}`,
-  //   },
-  //   `Skip to content`,
-  // )
+export function Main(...chi) {
+  return E.main.props(A.id(c.MAIN_ID).cls(`gap-ver-4`)).chi(...chi)
 }
 
-export function Main(...children) {
-  return e.main({id: c.MAIN_ID, class: `gap-ver-4`}, children)
-}
-
-export function Inner(...children) {
-  return e.div({class: `page-inner gap-ver-2-to-4`}, children)
+export function Inner(...chi) {
+  return E.div.props(A.cls(`page-inner gap-ver-2-to-4`)).chi(...chi)
 }
 
 export function GridImg(src) {
-  const img = Img({src})
-  return img && e.span({class: `pad-4`}, img)
+  const img = Img(src)
+  return a.vac(img) && E.span.props(A.cls(`pad-4`)).chi(img)
 }
 
-export function Jumbo({theme, title, sub, desc}) {
-  return (
-    e.div({class: theme},
-      title && e.h1({class: `jumbo-title`}, title),
-      sub && e.p({class: `jumbo-sub`}, sub),
-      desc && e.p({class: `jumbo-desc`}, desc),
-    )
+export function Jumbo({title, sub, desc}) {
+  return E.div.chi(
+    a.vac(title) && E.h1.props(A.cls(`jumbo-title`)).chi(title),
+    a.vac(sub) && E.p.props(A.cls(`jumbo-sub`)).chi(sub),
+    a.vac(desc) && E.p.props(A.cls(`jumbo-desc`)).chi(desc),
   )
 }
 
-export function Img({src, ...props}) {
-  src = f.str(src)
-  return f.vac(src) && e.img({src, is: `a-img`, ...props})
+export function Img(src) {
+  src = a.renderLax(src)
+  return a.vac(src) && E.img.props({src, is: `a-img`})
 }
 
 export function LogoLink() {
-  return e.a({href: `/`, class: `brand-logo-link`}, `<pure:lab>`)
+  return E.a.props(A.href(`/`).cls(`brand-logo-link`)).chi(`<pure:lab>`)
 }
 
 // TODO: sync-up with design.
 export function Showcase({title, desc, href, img}) {
-  return e.div({class: `showcase`},
-    e.div({class: `showcase-info`},
-      e.h2v(title),
-      e.p({style: {marginTop: `auto`}}, desc),
-      f.vac(href) && A({href, class: `decolink`}, href),
+  return E.div.props(A.cls(`showcase`)).chi(
+    E.div.props(A.cls(`showcase-info`)).chi(
+      E.h2.chi(title),
+      E.p.props(A.style(`margin-top: auto`)).chi(desc),
+      a.vac(href) && E.a.props(A.href(href).cls(`decolink`)).chi(href),
     ),
     AspectRatio(
-      {tagName: `a`, ...u.link(href), class: `showcase-img`},
-      Img({src: img}),
+      {tagName: `a`, props: A.cls(`showcase-img`).href(href).tarblan()},
+      Img(img),
     ),
   )
 }
 
-export function A({page, href, ...props}, ...children) {
-  return e.a({...props, ...u.link(href, page)}, children)
-}
-
 /*
 Unlike the "padding-bottom" trick, this doesn't require "position: absolute" for
-children. Sources:
+chi. Sources:
 
   * https://codeburst.io/keeping-aspect-ratio-with-html-and-no-padding-tricks-40705656808b
   * https://stackoverflow.com/a/53245657/1882154
@@ -167,16 +130,13 @@ The new CSS property `aspect-ratio` provides a better solution, but is
 unsupported in Safari <= 14.
 */
 export function AspectRatio(
-  {ratio: [hor, ver] = [], tagName, class: cls, ...props},
-  ...children
+  {ratio: [hor, ver] = [], tagName, props},
+  ...chi
 ) {
-  hor = f.nat(hor) || 16
-  ver = f.nat(ver) || 9
-
-  return E(
-    tagName || `div`,
-    {class: x.cls(`aspect-ratio`, cls), ...props},
-    E(`svg`, {viewBox: `0 0 ${hor} ${ver}`}),
-    children,
-  )
+  return E[tagName || `div`]
+    .props(A.with(props).cls(`aspect-ratio`))
+    .chi(
+      S.svg.props({viewBox: `0 0 ${a.laxNat(hor) || 16} ${a.laxNat(ver) || 9}`}),
+      chi,
+    )
 }

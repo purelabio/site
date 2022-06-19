@@ -1,26 +1,26 @@
-/* eslint-disable no-unused-vars */
-
-import * as f from 'fpx'
-import {E} from 'prax'
-import * as x from 'prax'
-import * as es from 'espo'
+import * as a from '@mitranim/js/all.mjs'
+import {paths as pt} from '@mitranim/js/io_deno.mjs'
 import * as c from './conf.mjs'
+import {A, E} from './util.mjs'
 import * as u from './util.mjs'
-import * as e from './elem.mjs'
 import * as sm from './site_misc.mjs'
 
-export class Site {
+export class Site extends a.MixMain(a.Emp) {
   constructor() {
+    super()
+
+    this.notFound = new Page404(this)
+
     this.main = [
-      new PageWhat(),
-      new PageWho(),
-      // new PageContact(),
+      new PageWhat(this),
+      new PageWho(this),
+      // new PageContact(this),
     ]
 
     this.misc = [
-      new Page404(),
-      new PageIndex(),
-      // new PageStart(),
+      this.notFound,
+      new PageIndex(this),
+      // new PageStart(this),
     ]
   }
 
@@ -29,61 +29,92 @@ export class Site {
     yield *this.misc
   }
 
-  pageByLink(link) {
-    for (const val of this.pages()) if (val.link === link) return val
+  pageByPath(path) {
+    for (const val of this.pages()) if (val.urlPath() === path) return val
     return undefined
   }
 }
 
-class Page {
-  constructor(val) {f.assign(this, val)}
-  get path() {return f.vac(this.link && f.str(this.link) + `.html`)}
-  set path(path) {es.pubs(this, {path})}
-  res() {throw Error(`implement in subclass`)}
-}
+class Page extends a.Emp {
+  constructor(site) {super().site = site}
 
-export class PageErr extends Page {
-  get title() {return `unexpected error`}
+  #site = undefined
+  get site() {return this.#site}
+  set site(val) {this.#site = a.reqInst(val, Site)}
 
-  res(site) {
-    const err = this.err || Error(this.title)
+  fsPath() {
+    const path = a.laxStr(this.urlPath())
+    return path && a.stripPre(path, `/`) + `.html`
+  }
 
-    return u.resHtml(sm.Html(
-      {page: this, site},
-      e.pre({class: `page-inner pad-2`}, err.stack || err.message || err),
-    ), {status: 500})
+  urlPath() {}
+  title() {}
+  theme() {}
+
+  targetPath() {
+    const path = a.laxStr(this.fsPath())
+    return path && pt.join(c.TARGET, path)
+  }
+
+  res() {return a.resBui().html(this.body()).res()}
+  body() {return this.html()}
+  html(...chi) {return sm.Html(this, ...chi)}
+
+  write() {
+    const path = this.targetPath()
+    if (!path) return
+
+    const body = this.body()
+    if (!body) return
+
+    globalThis.Deno.mkdirSync(pt.dir(path), {recursive: true})
+    globalThis.Deno.writeTextFileSync(path, body)
   }
 }
 
-export class Page404 extends Page {
-  get path() {return `404.html`}
-  get title() {return `Page Not Found`}
+export class PageErr extends Page {
+  constructor(site, err) {super(site).err = err}
+  res() {return a.resBui().html(this.body()).code(this.code()).res()}
+  code() {return 500}
+  title() {return `unexpected error`}
 
-  res(site) {
-    return u.resHtml(sm.Html(
-      {page: this, site},
-      sm.Main(
-        sm.Jumbo({
-          title: `Page Not Found`,
-          sub: `Sorry! Page not found`,
-        }),
-      ),
-    ), {status: 404})
+  body() {
+    const err = this.err || Error(this.title())
+    return this.html(
+      E.pre
+        .props(A.cls(`page-inner pad-2`))
+        .chi(err.stack || err.message || err),
+    )
+  }
+}
+
+export class Page404 extends PageErr {
+  fsPath() {return `404.html`}
+  code() {return 404}
+  title() {return `Page Not Found`}
+
+  body() {
+    return this.html(sm.Main(
+      sm.Jumbo({
+        title: this.title(),
+        sub: `Sorry! Page not found`,
+      }),
+    ))
   }
 }
 
 class PageIndex extends Page {
-  get link() {return `/`}
-  get path() {return `index.html`}
+  fsPath() {return `index.html`}
+  urlPath() {return `/`}
+  theme() {return `theme-inv`}
 
-  res(site) {
-    return u.resHtml(sm.Html(
-      {page: this, site, theme: `theme-inv`},
+  body() {
+    return this.html(
       sm.Main(
         MainBanner(),
         sm.Inner(
           sm.Showcase({
-            title: [e.bv(`Web`), e.br(), `Development`],
+            title: [E.b.chi(`Web`), E.br, `Development`],
             desc: u.collapse(`
               We work with the latest tech stacks to engineer front-end
               and back-end solutions, and do everything from single page
@@ -94,7 +125,7 @@ class PageIndex extends Page {
             img: u.imgPath(`Rectangle Copy 13.png`),
           }),
           sm.Showcase({
-            title: [e.bv(`Mobile App`), e.br(), `Development`],
+            title: [E.b.chi(`Mobile App`), E.br, `Development`],
             desc: u.collapse(`
               We specialise in native and cross-platform consumer apps,
               creating exceptional digital experience at every touch point.
@@ -104,34 +135,34 @@ class PageIndex extends Page {
             img: u.imgPath(`Rectangle Copy 33.png`),
           }),
           sm.Showcase({
-            title: [e.bv(`UX / UI`), e.br(), `Interface Development`],
+            title: [E.b.chi(`UX / UI`), E.br, `Interface Development`],
             desc: u.collapse(`
               We combine product innovation with optimum usability. Through our iterative design process and thorough prototyping, we create an engaging and human-centric design that is scalable and a joy to use. Our team stays involved from the discovery phase to the final milestones to ensure that no part of your vision is lost in translation.
             `),
             img: u.imgPath(`Rectangle Copy 34.png`),
           }),
           sm.Showcase({
-            title: [e.bv(`IoT`), e.br(), `Development Services`],
+            title: [E.b.chi(`IoT`), E.br, `Development Services`],
             desc: u.collapse(`
               We help our customers design innovative IoT products to enable seamless and smooth experiences. Our teams are well-versed at all levels of the product development cycle - from board design to UX / UI to app development and system integration.
             `),
             img: u.imgPath(`Rectangle Copy 35.png`),
           }),
           sm.Showcase({
-            title: [e.bv(`Quality`), e.br(), `Assurance`],
+            title: [E.b.chi(`Quality`), E.br, `Assurance`],
             desc: u.collapse(`
               We help ensure premium product quality by offering a comprehensive QA process which encompasses all stages of development. Our services consist of a combination of automated and manual testing, making sure your product follows up-to-date quality assurance standards.
             `),
             img: u.imgPath(`Rectangle Copy 36.png`),
           }),
           sm.Showcase({
-            title: [e.bv(`AI & ML`), e.br(), `Artificial Intelligence & Machine Learning`],
+            title: [E.b.chi(`AI & ML`), E.br, `Artificial Intelligence & Machine Learning`],
             desc: u.collapse(`
               We provide services to augment your existing platforms and solutions with the power of computer vision, data visualizations, predictive analysis and more.
             `),
             img: u.imgPath(`Rectangle Copy 37.png`),
           }),
-          e.div({class: `grid-logos`},
+          E.div.props(A.cls(`grid-logos`)).chi(
             sm.GridImg(u.imgPath(`Group 2@1,5x.svg`)),
             sm.GridImg(u.imgPath(`Group Copy 3@1,5x.svg`)),
             sm.GridImg(u.imgPath(`ecommpay-logo-blue@1,5x.svg`)),
@@ -155,42 +186,39 @@ class PageIndex extends Page {
           )
         )
       )
-    ))
+    )
   }
 }
 
 function MainBanner() {
-  return e.div(
-    {class: `theme-inv pad-top-8 flex row-bet-sta page-pad-outer-1 gold-rat-lg-sm`},
-    e.div({class: `gap-ver-aro-1`},
-      e.div(
-        {class: `size-huge wid-narrow`},
-        u.mdToHtml(u.collapse(`
-          **System integrator** that builds
-          world class **digital products**
-          creating **real business value**
-        `)),
+  return E.div
+    .props(A.cls(`theme-inv pad-top-8 flex row-bet-sta page-pad-outer-1 gold-rat-lg-sm`))
+    .chi(
+      E.div.props(A.cls(`gap-ver-aro-1`)).chi(
+        E.h1.props(A.cls(`size-huge wid-narrow`)).chi(
+          u.mdToHtml(u.collapse(`
+            **System integrator** that builds
+            world class **digital products**
+            creating **real business value**
+          `)),
+        ),
+        E.p.chi(c.GEO),
       ),
-      e.pv(c.GEO),
-    ),
-    sm.Img({
-      src: u.imgPath(`Group 11 Copy.svg`),
-      style: {marginBottom: '-2rem'},
-    }),
-  )
+      sm.Img(u.imgPath(`Group 11 Copy.svg`))
+        .props(A.style(`margin-bottom: -2rem`)),
+    )
 }
 
 class PageWho extends Page {
-  get link() {return `/who`}
-  get title() {return `Who we are`}
+  urlPath() {return `/who`}
+  title() {return `Who we are`}
 
   // Placeholder.
-  res(site) {
-    return u.resHtml(sm.Html(
-      {page: this, site},
+  body() {
+    return this.html(
       sm.Main(
         sm.Jumbo({
-          title: this.title,
+          title: this.title(),
           sub: u.mdToHtml(u.collapse(`
             **We are**
             creative **designers**,
@@ -213,7 +241,7 @@ class PageWho extends Page {
           LetsWorkTogether(),
         ),
       ),
-    ))
+    )
   }
 }
 
@@ -225,17 +253,17 @@ const MUGS = [
 ]
 
 function Mugs() {
-  return e.div({class: `grid-2-to-4`}, f.map(MUGS, Mug))
+  return E.div.props(A.cls(`grid-2-to-4`)).chi(a.map(MUGS, Mug))
 }
 
 function Mug({name, title, img}) {
-  return e.div({class: `flex col gap-ver-1`},
+  return E.div.props(A.cls(`flex col gap-ver-1`)).chi(
     sm.AspectRatio(
       {hor: 1, ver: 1},
-      sm.Img({src: img, class: `img-std grayscale`}),
+      sm.Img(img).props(A.cls(`img-std grayscale`)),
     ),
-    e.pv(e.bv(title)),
-    e.pv(name),
+    E.p.chi(E.b.chi(title)),
+    E.p.chi(name),
   )
 }
 
@@ -301,25 +329,27 @@ const BOASTS = [
 ]
 
 function Boasting() {
-  return e.div({class: `gap-ver-2`},
-    e.pv(u.collapse(`
+  return E.div.props(A.cls(`gap-ver-2`)).chi(
+    E.p.chi(u.collapse(`
       Сontinuous improvement of our own skills
       and mastering the most modern technologies
       allow us and our customers
       to be at the top of technological excellence,
       providing the best service to customers.
     `)),
-    e.div({class: `grid-2-to-4`}, f.map(BOASTS, Boast)),
+    E.div.props(A.cls(`grid-2-to-4`)).chi(a.map(BOASTS, Boast)),
     BoastIcons(),
   )
 }
 
 function Boast({title, list}) {
-  return e.div({class: `gap-ver-1`},
-    e.h3({class: `bold`}, title),
-    e.ul({class: `list-inside`}, f.map(list, f.cwk, e.liv)),
+  return E.div.props(A.cls(`gap-ver-1`)).chi(
+    E.h3.props(A.cls(`bold`)).chi(title),
+    E.ul.props(A.cls(`list-inside`)).chi(a.map(list, ListItem)),
   )
 }
+
+function ListItem(val) {return E.li.chi(val)}
 
 // Placeholder.
 function BoastIcons() {}
@@ -328,18 +358,17 @@ function BoastIcons() {}
 function LetsWorkTogether() {}
 
 class PageWhat extends Page {
-  get link() {return `/what`}
-  get title() {return `What we've done`}
+  urlPath() {return `/what`}
+  title() {return `What we've done`}
 
-  res(site) {
-    return u.resHtml(sm.Html(
-      {page: this, site},
+  body() {
+    return this.html(
       sm.Main(
         sm.Jumbo({
-          title: this.title,
+          title: this.title(),
           sub: [
             `We have done `,
-            e.bv(`many projects`),
+            E.b.chi(`many projects`),
             `, here are some of them`,
           ],
           desc: u.collapse(`
@@ -348,87 +377,80 @@ class PageWhat extends Page {
         }),
         sm.Inner(
           sm.Showcase({
-            title: [e.bv(`Butik`), e.br(), `Digital Department Store`],
+            title: [E.b.chi(`Butik`), E.br, `Digital Department Store`],
             desc: `Russia's first dark store — type automated store`,
             img: u.imgPath(`Rectangle.png`),
             href: `https://butik.ru`,
           }),
           sm.Showcase({
-            title: [e.bv(`Butik`), e.br(), `Ecosystem of Digital Products`],
+            title: [E.b.chi(`Butik`), E.br, `Ecosystem of Digital Products`],
             desc: `E-commerce several mobile applications and website`,
             img: u.imgPath(`Rectangle Copy.png`),
             href: `https://butik.ru`,
           }),
           sm.Showcase({
-            title: [e.bv(`AI & ML`), e.br(), `E-commerce Personalization and Recommendations`],
+            title: [E.b.chi(`AI & ML`), E.br, `E-commerce Personalization and Recommendations`],
             desc: `Artificial Intelligence & Machine Learning platform for mobile applications and website`,
             img: u.imgPath(`Group 9@1x.png`),
             href: `https://butik.ru`,
           }),
           sm.Showcase({
-            title: [e.bv(`Expert Me`), e.br(), `Web Platform`],
+            title: [E.b.chi(`Expert Me`), E.br, `Web Platform`],
             desc: `Automated web platform and website`,
             img: u.imgPath(`Group 12@1x.png`),
             href: `https://expertme.ru`,
           }),
           // TODO: better description! (Update design first.)
           sm.Showcase({
-            title: [e.bv(`Core Spirit`), e.br(), `Social Web Platform`],
+            title: [E.b.chi(`Core Spirit`), E.br, `Social Web Platform`],
             desc: `Web platform`,
             img: u.imgPath(`Group 13@1x.png`),
             href: `https://corespirit.com`,
           }),
           sm.Showcase({
-            title: [e.bv(`Binary Management`), e.br(), `Management Tool for Interior Designers`],
+            title: [E.b.chi(`Binary Management`), E.br, `Management Tool for Interior Designers`],
             desc: `Web platform and marketing website`,
             img: u.imgPath(`Group 14@1x.png`),
             href: `https://binarymanagement.com`,
           }),
           sm.Showcase({
-            title: [e.bv(`Ford Fiesta`), e.br(), `Marketing Website`],
+            title: [E.b.chi(`Ford Fiesta`), E.br, `Marketing Website`],
             desc: `Marketing website`,
             img: u.imgPath(`Rectangle Copy 5.png`),
             href: `https://fiesta.ford.ru`,
           }),
           sm.Showcase({
-            title: [e.bv(`Tobox (Redmond)`), e.br(), `Ecosystem of Digital Products`],
+            title: [E.b.chi(`Tobox (Redmond)`), E.br, `Ecosystem of Digital Products`],
             desc: `E-commerce several mobile applications and website`,
             img: u.imgPath(`Group 15@1x.png`),
             href: `https://tobox.com`,
           }),
           sm.Showcase({
-            title: [e.bv(`Shanzhai City`), e.br(), `Charity Web Platform`],
+            title: [E.b.chi(`Shanzhai City`), E.br, `Charity Web Platform`],
             desc: `Website`,
             img: u.imgPath(`Group 16@1x.png`),
             href: `https://shanzhai.city`,
           }),
           sm.Showcase({
-            title: [e.bv(`Shake`), e.br(), `Car Sharing Marketplace`],
+            title: [E.b.chi(`Shake`), E.br, `Car Sharing Marketplace`],
             desc: `Mobile applications for iOS and Android and website`,
             img: u.imgPath(`Group 17@1x.png`),
             href: `https://shakeapp.ru`,
           }),
         ),
       )
-    ))
+    )
   }
 }
 
-class PageContact extends Page {
-  get link() {return `contact`}
-  get title() {return `Contact us`}
-
-  // Placeholder.
-  res(site) {
-    return u.resHtml(sm.Html({page: this, site}))
-  }
+// Placeholder.
+class _PageContact extends Page {
+  urlPath() {return `/contact`}
+  title() {return `Contact us`}
 }
 
-class PageStart extends Page {
-  get link() {return `/start`}
-
-  // Placeholder.
-  res(site) {
-    return u.resHtml(sm.Html({page: this, site}))
-  }
+// Placeholder.
+class _PageStart extends Page {
+  urlPath() {return `/start`}
+  title() {return `Start a project with us`}
 }

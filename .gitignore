@@ -5,12 +5,13 @@
 !/styles
 !/templates
 !/scripts
-!/submodules
+!/mod
 
 !/*rc
 !/*ignore
 !/*.md
-!/*.json
+!/.dprint.json
+!/importmap.json
 !/makefile
 !/.gitmodules
 

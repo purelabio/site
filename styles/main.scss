@@ -1,6 +1,6 @@
 @use 'sass:color';
-@use 'style-base/reset';
-@use 'style-base/sb';
+@use './mod/sb/reset';
+@use './mod/sb/sb';
 
 @include sb.all;
 
@@ -58,16 +58,16 @@ $z-skip: $z-nav + 1;
   --wid-inner-max:      #{$breakpoint-md};
   --wid-lim:            80vw;
 
-  --font-size-h1:       1.6rem;
-  --font-size-h2:       1.4rem;
-  --font-size-h3:       1.2rem;
-  --font-size-small:    0.8rem;
-  --font-size-normal:   1rem;
-  --font-size-large:    1.4rem;
-  --font-size-huge:     2rem;
-  --font-size-giant:    4rem;
-  --font-size-titan:    6rem;
-  --font-size-monster:  8rem;
+  --size-h1:       1.6rem;
+  --size-h2:       1.4rem;
+  --size-h3:       1.2rem;
+  --size-small:    0.8rem;
+  --size-normal:   1rem;
+  --size-large:    1.4rem;
+  --size-huge:     2rem;
+  --size-giant:    4rem;
+  --size-titan:    6rem;
+  --size-monster:  8rem;
 
   --border-radius:      4px;
   --thick-border-width: 2px;
@@ -209,13 +209,13 @@ code, key, pre {@extend .code;}
 .wei-normal {@extend .wei-lighter;}
 .wei-bold   {@extend .wei-semi;}
 
-.size-small   {font-size: var(--font-size-small);}
-.size-normal  {font-size: var(--font-size-normal);}
-.size-large   {font-size: var(--font-size-large);}
-.size-huge    {font-size: var(--font-size-huge);}
-.size-giant   {font-size: var(--font-size-giant);}
-.size-titan   {font-size: var(--font-size-titan);}
-.size-monster {font-size: var(--font-size-monster);}
+.size-small   {font-size: var(--size-small);}
+.size-normal  {font-size: var(--size-normal);}
+.size-large   {font-size: var(--size-large);}
+.size-huge    {font-size: var(--size-huge);}
+.size-giant   {font-size: var(--size-giant);}
+.size-titan   {font-size: var(--size-titan);}
+.size-monster {font-size: var(--size-monster);}
 
 .font-mono {font-family: SF Mono, Menlo, Monaco, DejaVu Sans Mono, Consolas, monospace;}
 
@@ -312,15 +312,15 @@ code, key, pre {@extend .code;}
 
 .pad-top-6 {padding-top: 6rem;}
 .pad-top-8 {padding-top: 8rem;}
-.mar-top-aut {margin-top: auto;}
 
+:any-link {cursor: pointer;}
 [disabled] {@extend .cur-not;}
 
 .navbar {
   @extend .sticky, .wid-100p, .page-pad-outer-1, .flex, .row-bet-cen, .pad-ver-2;
   // @extend .wid-100p, .page-pad-outer-1, .flex, .row-bet-cen, .pad-ver-2;
 
-  // Required for `.--stuck` detection, see `navbar.html`.
+  // Required for `.--stuck` detection, see `inline.mjs`.
   top: -1px;
   left: 0;
   right: 0;
@@ -355,7 +355,7 @@ code, key, pre {@extend .code;}
   @include hov {@extend .fg-act-hov;}
 }
 
-.footer       {@extend .mar-top-aut;}
+.footer       {@extend .mar-top-auto;}
 .footer-track {@extend .page-inner, .flex, .row;}
 .footer-cell  {@extend .flex-1, .flex-noshrink, .pad-1;}
 
@@ -400,7 +400,7 @@ code, key, pre {@extend .code;}
 .jumbo-title {
   @extend .wei-bold;
   color: var(--c-gray-bg-near);
-  font-size: var(--font-size-titan);
+  font-size: var(--size-titan);
 
   // Magic number, TODO avoid.
   line-height: 2ex;
@@ -409,7 +409,7 @@ code, key, pre {@extend .code;}
 
   @include min-lg {
     @include page-pad(page-pad-outer-minus-1-em());
-    font-size: var(--font-size-monster);
+    font-size: var(--size-monster);
   }
 }
 

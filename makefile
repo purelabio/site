@@ -1,8 +1,11 @@
 MAKEFLAGS := --silent --always-make
 PAR := $(MAKE) -j 128
 TAR := target
-SASS := sass --no-source-map -I submodules styles/main.scss:$(TAR)/styles/main.css
-DENO := deno run -A --import-map importmap.json --unstable --no-check
+SASS := sass --no-source-map -I . styles/main.scss:$(TAR)/styles/main.css
+IMPORTMAP_FLAG = $(if $(wildcard $(1)),--importmap=$(1),)
+IMPORTMAP_DENO_FLAG := $(or $(call IMPORTMAP_FLAG,importmap_override.json),$(call IMPORTMAP_FLAG,importmap.json))
+DENO_RUN := deno run -A --no-check $(IMPORTMAP_DENO_FLAG)
+DENO_WAT := $(DENO_RUN) --watch
 
 ifeq ($(PROD), true)
 	SASS := $(SASS) --style=compressed
@@ -29,34 +32,36 @@ else
 endif
 
 watch: clean
-	$(PAR) styles-w afr srv-w
+	$(PAR) styles_w srv_w live
 
-build: clean
+build: clean all
+
+all:
 	$(PAR) styles pages cp
 
-styles-w:
+styles_w:
 	$(SASS) --watch
 
 styles:
 	$(SASS)
 
-afr:
-	deno run -A --unstable --no-check https://deno.land/x/afr@0.5.1/afr.ts --port 53733
+live:
+	$(DENO_RUN) scripts/cmd_live.mjs
 
-srv-w:
-	$(DENO) --watch scripts/cmd_srv.mjs
+srv_w:
+	$(DENO_WAT) scripts/cmd_srv.mjs
 
 srv:
-	$(DENO) scripts/cmd_srv.mjs
+	$(DENO_RUN) scripts/cmd_srv.mjs
 
-pages-w:
-	$(DENO) --watch scripts/cmd_pages.mjs
+pages_w:
+	$(DENO_WAT) scripts/cmd_pages.mjs
 
 pages:
-	$(DENO) scripts/cmd_pages.mjs
+	$(DENO_RUN) scripts/cmd_pages.mjs
 
 deno:
-	$(DENO) $(file)
+	$(DENO_RUN) $(file)
 
 cp:
 	$(call MKDIR,$(TAR))
